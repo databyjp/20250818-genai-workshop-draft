@@ -4,14 +4,20 @@ import weaviate
 from weaviate.classes.config import Configure, Property, DataType
 import pandas as pd
 import os
+from tqdm import tqdm
 
 def main():
     # Connect to Weaviate
-    client = weaviate.connect_to_local()
+    client = weaviate.connect_to_weaviate_cloud(
+        cluster_url=os.environ["WCD_TEST_URL"],
+        auth_credentials=os.environ["WCD_TEST_KEY"]
+    )
 
     try:
         # Create collection
         collection_name = "FinancialArticles"
+
+        client.collections.delete(collection_name)
 
         client.collections.create(
             collection_name,
@@ -22,25 +28,34 @@ def main():
                 Property(name="url", data_type=DataType.TEXT),
                 Property(name="date", data_type=DataType.DATE)
             ],
-            vector_config=Configure.Vectors.text2vec_ollama(
-                source_properties=["article_title", "article"],
-                api_endpoint="http://host.docker.internal:11434",
-                model="snowflake-arctic-embed2",
-                quantizer=Configure.VectorIndex.Quantizer.rq(),
-            ),
+            vector_config=[
+                Configure.Vectors.text2vec_weaviate(
+                    name="title",
+                    source_properties=["article_title"],
+                    model="Snowflake/snowflake-arctic-embed-l-v2.0",
+                    quantizer=Configure.VectorIndex.Quantizer.rq(),
+                ),
+                Configure.Vectors.text2vec_weaviate(
+                    name="body",
+                    source_properties=["article"],
+                    model="Snowflake/snowflake-arctic-embed-l-v2.0",
+                    quantizer=Configure.VectorIndex.Quantizer.rq(),
+                ),
+            ]
+            ,
         )
 
         collection = client.collections.get(collection_name)
 
         # Load and import data
-        df = pd.read_parquet("data/fin_news_articles_10k.parquet")
+        df = pd.read_parquet("data/fin_news_articles_5000.parquet")
         df['date'] = pd.to_datetime(df['date'], utc=True)
-        # df = df[:10]
+        # df = df[:100]
 
         print(f"Importing {len(df)} articles...")
 
         with collection.batch.fixed_size(batch_size=100) as batch:
-            for _, row in df.iterrows():
+            for _, row in tqdm(df.iterrows()):
                 batch.add_object({
                     "article_title": str(row['article_title']) if pd.notna(row['article_title']) else "",
                     "article": str(row['article']) if pd.notna(row['article']) else "",
@@ -52,7 +67,7 @@ def main():
         # Verify
         response = collection.query.fetch_objects(
             limit=3,
-            return_properties=["article_title", "stock_symbol"],
+            # return_properties=["article_title", "stock_symbol"],
             # include_vector=True
         )
         print(f"Successfully imported! Sample articles:")
