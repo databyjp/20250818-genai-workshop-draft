@@ -53,7 +53,7 @@ def convert_pdf_to_images(src_file_path: Path, img_path: Path) -> list[Path]:
 
 # Usage
 if __name__ == "__main__":
-    pdf_paths = Path("data/pdfs").glob("*.pdf")
+    pdf_paths = Path("data/pdfs").glob("reddit*.pdf")
     for pdf_path in pdf_paths:
         print(f"Converting {pdf_path} to images...")
         img_dir = Path("data/imgs")
