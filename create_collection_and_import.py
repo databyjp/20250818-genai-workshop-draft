@@ -45,7 +45,7 @@ def main():
             ,
         )
 
-        collection = client.collections.get(collection_name)
+        collection = client.collections.use(collection_name)
 
         # Load and import data
         df = pd.read_parquet("data/fin_news_articles_5000.parquet")
