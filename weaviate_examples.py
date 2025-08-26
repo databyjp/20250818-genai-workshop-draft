@@ -96,6 +96,8 @@ commonly_used_types = [
     DataType.UUID,
     DataType.UUID_ARRAY,
     DataType.BLOB,  # BLOB can be used to store images for example
+    DataType.OBJECT,
+    DataType.OBJECT_ARRAY,
 ]
 
 # Basic collection creation
