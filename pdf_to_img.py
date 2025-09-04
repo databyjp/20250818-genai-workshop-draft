@@ -56,7 +56,8 @@ def convert_pdf_to_images(src_file_path: Path, img_path: Path) -> list[Path]:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert PDF files to images")
     parser.add_argument(
-        "--pattern",
+        "pattern",
+        nargs="?",
         default="*.pdf",
         help="File pattern to match PDF files (default: *.pdf)"
     )
