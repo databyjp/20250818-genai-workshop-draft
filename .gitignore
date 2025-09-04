@@ -1,7 +1,5 @@
 wiki-data
 data/imgs
-data/parsed/**/*.jpg
-data/parsed/**/*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
