@@ -1,6 +1,7 @@
 from pathlib import Path
 import pymupdf
 import math
+import argparse
 
 
 def convert_pdf_to_images(src_file_path: Path, img_path: Path) -> list[Path]:
@@ -53,7 +54,15 @@ def convert_pdf_to_images(src_file_path: Path, img_path: Path) -> list[Path]:
 
 # Usage
 if __name__ == "__main__":
-    pdf_paths = Path("data/pdfs").glob("*.pdf")
+    parser = argparse.ArgumentParser(description="Convert PDF files to images")
+    parser.add_argument(
+        "--pattern",
+        default="*.pdf",
+        help="File pattern to match PDF files (default: *.pdf)"
+    )
+    args = parser.parse_args()
+
+    pdf_paths = Path("data/pdfs").glob(args.pattern)
     for pdf_path in pdf_paths:
         print(f"Converting {pdf_path} to images...")
         img_dir = Path("data/imgs")
