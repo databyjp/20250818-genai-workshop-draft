@@ -31,11 +31,11 @@ def parse_pdf_with_images(input_doc_path: Path, output_dir: Path):
 
     conv_res = doc_converter.convert(input_doc_path)
 
-    # Save markdown with embedded pictures
+    # Save markdown with referenced pictures
     conv_res.document.save_as_markdown(md_filename, image_mode=ImageRefMode.REFERENCED)
 
 
-pdf_names = [f.name for f in data_folder.glob("*.pdf") if (f.is_file() and "reddit" not in f.name)]
+pdf_names = [f.name for f in data_folder.glob("hai*.pdf")]
 
 for pdf_fname in pdf_names:
     print(f"Processing file: {pdf_fname}")
